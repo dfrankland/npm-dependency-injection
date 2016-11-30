@@ -1,0 +1,57 @@
+{
+  "name": "npm-dependency-injection",
+  "version": "0.0.0",
+  "description": "A very dumb version of dependency injection for `npm`.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dfrankland/npm-dependency-injection.git"
+  },
+  "keywords": [
+    "npm",
+    "dependency",
+    "dependencies",
+    "inject",
+    "ioc",
+    "di",
+    "injection"
+  ],
+  "author": "Dylan Frankland <dylan@frankland.io>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dfrankland/npm-dependency-injection/issues"
+  },
+  "homepage": "https://github.com/dfrankland/npm-dependency-injection#readme",
+  "files": [
+    "dist/index.js"
+  ],
+  "main": "./dist/index.js",
+  "scripts": {
+    "prepublish": "npm run build",
+    "build": "babel ./src --out-dir ./dist",
+    "test": "npm run build && babel-node ./test/test.js"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.18.0",
+    "babel-plugin-transform-runtime": "^6.15.0",
+    "babel-preset-modern-node": "^3.2.0",
+    "babel-preset-stage-0": "^6.16.0"
+  },
+  "dependencies": {
+    "babel-runtime": "^6.18.0",
+    "npm-programmatic": "^0.0.6"
+  },
+  "babel": {
+    "plugins": [
+      "transform-runtime"
+    ],
+    "presets": [
+      [
+        "modern-node",
+        {
+          "version": "0.12"
+        }
+      ],
+      "stage-0"
+    ]
+  }
+}
