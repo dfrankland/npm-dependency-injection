@@ -1,11 +1,10 @@
 # `npm-dependency-injection`
 
-A very dumb version of dependency injection for `npm`. Basically, a wrapper for
-[`npm-programmatic`][1].
+A very dumb version of dependency injection for `npm`.
 
 **Please don't use this for anything that is _production_ code.** This is great
 for personal tools and projects that need `npm` dependencies without maintaining
-a `package.json` (example: [Hyper.app][2]).
+a `package.json` (example: [Hyper.app][1]).
 
 ## How to use
 1.  Import the module
@@ -53,19 +52,10 @@ getDependencies(arrayOfDependencies, options);
 
 *   `options`: An object with the following properties
 
-    *   `save`: Boolean, whether to save this to `dependencies` in
-        `package.json`.
-
-    *   `global`: Boolean, whether to save this to global modules.
-
     *   `cwd`: String, absolute path to where `npm` modules should be read from,
-        saved, or installed to. Defaults to `/`.
-
-    *   `saveDev`: Boolean, whether to save this to `devDependencies` in
-        `package.json`.
+        saved, or installed to. Defaults to `process.cwd`.
 
     *   `output`: Boolean, whether to show the output from `npm`. Good for,
         debugging purposes.
 
-[1]: https://github.com/Manak/npm-programmatic
-[2]: https://hyper.is/
+[1]: https://hyper.is/

@@ -22,7 +22,8 @@
   },
   "homepage": "https://github.com/dfrankland/npm-dependency-injection#readme",
   "files": [
-    "dist/index.js"
+    "dist/index.js",
+    "dist/npm.js"
   ],
   "main": "./dist/index.js",
   "scripts": {
