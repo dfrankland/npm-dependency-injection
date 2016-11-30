@@ -3,13 +3,11 @@ import getDependencies from '../dist/index.js';
 (async () => {
   const {
     pokemonsay,
-    'image-xterm-loader': imageXtermLoader,
     lastpass,
   } = await getDependencies([
     'pokemonsay',
     'lastpass',
   ], {
-    cwd: __dirname,
     output: true,
   });
 

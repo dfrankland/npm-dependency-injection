@@ -1,4 +1,4 @@
-import npm from 'npm-programmatic';
+import npm from './npm';
 
 const defaultErrorMessage = '`npm-dependency-injection` had an issue';
 const defaultErrorSuggestion = 'Pass `output: true` in the options to see more details.';
