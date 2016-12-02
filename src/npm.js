@@ -35,7 +35,7 @@ const outAsync = (output, child) => {
 };
 
 export default {
-  list: (cwd = process.cwd(), { output } = {}) => new Promise(
+  list: (cwd, output) => new Promise(
     (resolve, reject) => {
       const child = spawn(
         'npm',
@@ -73,7 +73,7 @@ export default {
     }
   ),
 
-  install: async (dependencies = [], { cwd = process.cwd(), output } = {}) => {
+  install: async (dependencies, cwd, output) => {
     checkDependencies(dependencies);
     return new Promise(
       (resolve, reject) => {
@@ -88,7 +88,7 @@ export default {
     );
   },
 
-  listSync: (cwd = process.cwd(), { output } = {}) => {
+  listSync: (cwd, output) => {
     const { stdout, stderr, error } = spawnSync(
       'npm',
       ['ls', '--depth=0', '--json'],
@@ -102,7 +102,7 @@ export default {
     }
   },
 
-  installSync: (dependencies = [], { cwd = process.cwd(), output } = {}) => {
+  installSync: (dependencies, cwd, output) => {
     checkDependencies(dependencies);
     const { stdout, stderr, error } = spawnSync(
       'npm',

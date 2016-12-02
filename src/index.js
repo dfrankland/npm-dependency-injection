@@ -28,42 +28,42 @@ const requireAll = dependencies =>
   );
 
 export default {
-  async: async (dependencies, options) => {
+  async: async (dependencies, { cwd = process.cwd(), output } = {}) => {
     let installedDependencies = [];
     try {
-      installedDependencies = await npm.list(options.cwd, options);
+      installedDependencies = await npm.list(cwd, output);
     } catch (err) {
-      throw getFindError(options.cwd, err);
+      throw getFindError(cwd, err);
     }
 
     const dependenciesToInstall = findDependenciesToInstall(dependencies, installedDependencies);
 
     if (dependenciesToInstall.length > 0) {
       try {
-        await npm.install(dependenciesToInstall, options);
+        await npm.install(dependenciesToInstall, cwd, output);
       } catch (err) {
-        throw getInstallError(options.cwd, err);
+        throw getInstallError(cwd, err);
       }
     }
 
     return requireAll(dependencies);
   },
 
-  sync: (dependencies, options) => {
+  sync: (dependencies, { cwd = process.cwd(), output } = {}) => {
     let installedDependencies = [];
     try {
-      installedDependencies = npm.listSync(options.cwd, options);
+      installedDependencies = npm.listSync(cwd, output);
     } catch (err) {
-      throw getFindError(options.cwd, err);
+      throw getFindError(cwd, err);
     }
 
     const dependenciesToInstall = findDependenciesToInstall(dependencies, installedDependencies);
 
     if (dependenciesToInstall.length > 0) {
       try {
-        npm.installSync(dependenciesToInstall, options);
+        npm.installSync(dependenciesToInstall, cwd, output);
       } catch (err) {
-        throw getInstallError(options.cwd, err);
+        throw getInstallError(cwd, err);
       }
     }
 
