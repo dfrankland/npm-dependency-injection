@@ -1,46 +1,89 @@
-import { exec } from 'child_process';
+import { spawn, spawnSync } from 'child_process';
+
+const checkDependencies = dependencies => {
+  if (!Array.isArray(dependencies) || dependencies.length < 1) {
+    throw new Error('No packages listed.');
+  }
+};
+
+const getDependenciesFromString = string => {
+  const json = JSON.parse(string);
+  const dependencies = json.dependencies || {};
+  return Object.keys(dependencies);
+};
+
+const outSync = (output, out, err) => {
+  if (output) {
+    if (out) console.log(out);
+    if (err) console.error(err);
+  }
+};
+
+const outAsync = (output, child) => {
+  if (output) {
+    let stdout = '';
+    child.stdout.on('data', data => stdout += data);
+
+    let stderr = '';
+    child.stderr.on('data', data => stderr += data);
+
+    child.on('close', code => {
+      console.log(stdout);
+      console.error(stderr);
+    });
+  }
+};
 
 export default {
-  list: (cwd = process.cwd, { output } = {}) => new Promise(
+  list: (cwd = process.cwd(), { output } = {}) => new Promise(
     (resolve, reject) => {
-      const child = exec(
-        'npm ls --depth=0 --json',
-        { cwd },
-        (error, stdout) => {
-          try {
-            const json = JSON.parse(stdout);
-            const dependencies = json.dependencies || {};
-            resolve(Object.keys(dependencies));
-          } catch (err) {
-            reject(error);
-          }
+      const child = spawn(
+        'npm',
+        ['ls', '--depth=0', '--json'],
+        { cwd }
+      );
+
+      outAsync(output, child);
+
+      let stdout = '';
+      child.stdout.on(
+        'data',
+        data => {
+          stdout += data;
+        },
+      );
+
+      let error;
+      child.on(
+        'error',
+        err => {
+          error = err;
         }
       );
 
-      if (output) {
-        child.stdout.on('data', data => console.log(data));
-        child.stderr.on('data', data => console.error(data));
-      }
+      child.on('close', code => {
+        try {
+          resolve(
+            getDependenciesFromString(stdout)
+          );
+        } catch (err) {
+          reject(error ? error : err);
+        }
+      });
     }
   ),
 
-  install: async (dependencies, { cwd = process.cwd, output } = {}) => {
-    if (!Array.isArray(dependencies) || dependencies.length < 1) {
-      throw new Error('No packages listed.');
-    }
-
+  install: async (dependencies = [], { cwd = process.cwd(), output } = {}) => {
+    checkDependencies(dependencies);
     return new Promise(
       (resolve, reject) => {
-        const child = exec(
-          `npm install ${dependencies.join(' ')}`,
-          { cwd },
-          error => error ? reject(error) : resolve(),
+        const child = spawn(
+          'npm',
+          ['install', ...dependencies],
         );
-
-        if (output) {
-          child.stdout.on('data', data => console.log(data));
-          child.stderr.on('data', data => console.error(data));
-        }
+        outAsync(output, child);
+        child.on('error', err => reject(err));
+        child.on('close', code => resolve(code));
       }
     );
   },
