@@ -48,4 +48,25 @@ export default {
 
     return requireAll(dependencies);
   },
+
+  sync: (dependencies, options) => {
+    let installedDependencies = [];
+    try {
+      installedDependencies = npm.listSync(options.cwd, options);
+    } catch (err) {
+      throw getFindError(options.cwd, err);
+    }
+
+    const dependenciesToInstall = findDependenciesToInstall(dependencies, installedDependencies);
+
+    if (dependenciesToInstall.length > 0) {
+      try {
+        npm.installSync(dependenciesToInstall, options);
+      } catch (err) {
+        throw getInstallError(options.cwd, err);
+      }
+    }
+
+    return requireAll(dependencies);
+  },
 };

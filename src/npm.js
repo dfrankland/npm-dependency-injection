@@ -87,4 +87,29 @@ export default {
       }
     );
   },
+
+  listSync: (cwd = process.cwd(), { output } = {}) => {
+    const { stdout, stderr, error } = spawnSync(
+      'npm',
+      ['ls', '--depth=0', '--json'],
+      { cwd, encoding: 'utf8' }
+    );
+    outSync(output, stdout, stderr);
+    try {
+      return getDependenciesFromString(stdout);
+    } catch (err) {
+      throw error ? error : err;
+    }
+  },
+
+  installSync: (dependencies = [], { cwd = process.cwd(), output } = {}) => {
+    checkDependencies(dependencies);
+    const { stdout, stderr, error } = spawnSync(
+      'npm',
+      ['install', ...dependencies],
+      { cwd, encoding: 'utf8' }
+    );
+    outSync(output, stdout, stderr);
+    if (error) throw error;
+  },
 };
