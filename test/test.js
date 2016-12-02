@@ -1,13 +1,14 @@
-import getDependencies from '../dist/index.js';
+import npm from '../src/index.js';
 
 (async () => {
   const {
     pokemonsay,
     lastpass,
-  } = await getDependencies([
+  } = await npm.async([
     'pokemonsay',
     'lastpass',
   ], {
+    cwd: process.cwd(),
     output: true,
   });
 
