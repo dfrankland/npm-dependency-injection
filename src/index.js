@@ -3,33 +3,49 @@ import npm from './npm';
 const defaultErrorMessage = '`npm-dependency-injection` had an issue';
 const defaultErrorSuggestion = 'Pass `output: true` in the options to see more details.';
 
-const getError = message => new Error(
-  `${defaultErrorMessage} ${message}.\n${defaultErrorSuggestion}`
+const getError = (message, err) => new Error(
+  `${defaultErrorMessage} ${message}.\n${defaultErrorSuggestion}\n${err ? err : ''}`
 );
 
-export default async (dependencies, options) => {
-  let installedDependencies = [];
-  try {
-    installedDependencies = await npm.list(options.cwd);
-  } catch (err) {
-    throw getError(`finding installed \`npm\` modules in \`${options.cwd}\``);
-  }
+const getFindError = (cwd, err) =>
+  getError(`finding installed \`npm\` modules in \`${cwd}\``);
 
-  const dependenciesToInstall = dependencies.filter(
+const getInstallError = (cwd, err) =>
+  getError(`installing \`npm\` dependencies to \`${cwd}\``, err);
+
+const findDependenciesToInstall = (dependencies, installedDependencies) =>
+  dependencies.filter(
     dependency => !installedDependencies.includes(dependency)
   );
 
-  try {
-    await npm.install(dependencies, options);
-  } catch (err) {
-    throw getError(`installing \`npm\` dependencies to \`${options.cwd}\``);
-  }
-
-  return dependencies.reduce(
-    (dependenyObject, nextDependeny) => {
-      const newDependenyObject = { ...dependenyObject };
-      newDependenyObject[nextDependeny] = require(nextDependeny);
-      return newDependenyObject;
+const requireAll = dependencies =>
+  dependencies.reduce(
+    (dependencyObject, nextDependency) => {
+      const newDependencyObject = { ...dependencyObject };
+      newDependencyObject[nextDependency] = require(nextDependency);
+      return newDependencyObject;
     }, {}
   );
+
+export default {
+  async: async (dependencies, options) => {
+    let installedDependencies = [];
+    try {
+      installedDependencies = await npm.list(options.cwd, options);
+    } catch (err) {
+      throw getFindError(options.cwd, err);
+    }
+
+    const dependenciesToInstall = findDependenciesToInstall(dependencies, installedDependencies);
+
+    if (dependenciesToInstall.length > 0) {
+      try {
+        await npm.install(dependenciesToInstall, options);
+      } catch (err) {
+        throw getInstallError(options.cwd, err);
+      }
+    }
+
+    return requireAll(dependencies);
+  },
 };
