@@ -1,4 +1,5 @@
 import npm from './npm';
+import { join as joinPath } from 'path';
 
 const defaultErrorMessage = '`npm-dependency-injection` had an issue';
 const defaultErrorSuggestion = 'Pass `output: true` in the options to see more details.';
@@ -18,11 +19,35 @@ const findDependenciesToInstall = (dependencies, installedDependencies) =>
     dependency => !installedDependencies.includes(dependency)
   );
 
-const requireAll = dependencies =>
+const requireAll = (cwd, dependencies) =>
   dependencies.reduce(
     (dependencyObject, nextDependency) => {
       const newDependencyObject = { ...dependencyObject };
-      newDependencyObject[nextDependency] = require(nextDependency);
+
+      let dependency = {};
+      const firstPath = joinPath(cwd, 'node_modules', nextDependency);
+      try {
+        dependency = require(firstPath);
+      } catch (err1) {
+        const secondPath = joinPath(cwd, nextDependency);
+        try {
+          dependency = require(secondPath);
+        } catch (err2) {
+          try {
+            dependency = require(nextDependency);
+          } catch (err3) {
+            throw new Error(
+              [
+                `Could not \`require\` module \'${nextDependency}\' globally or from:`,
+                firstPath,
+                secondPath,
+              ].join('\n')
+            );
+          }
+        }
+      }
+
+      newDependencyObject[nextDependency] = dependency;
       return newDependencyObject;
     }, {}
   );
@@ -46,7 +71,7 @@ export default {
       }
     }
 
-    return requireAll(dependencies);
+    return requireAll(cwd, dependencies);
   },
 
   sync: (dependencies, { cwd = process.cwd(), output } = {}) => {
@@ -67,6 +92,6 @@ export default {
       }
     }
 
-    return requireAll(dependencies);
+    return requireAll(cwd, dependencies);
   },
 };
