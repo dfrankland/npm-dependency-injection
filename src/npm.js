@@ -35,12 +35,12 @@ const outAsync = (output, child) => {
 };
 
 export default {
-  list: (cwd, output) => new Promise(
+  list: (cwd, output, env) => new Promise(
     (resolve, reject) => {
       const child = spawn(
         'npm',
         ['ls', '--depth=0', '--json'],
-        { cwd }
+        { cwd, env }
       );
 
       outAsync(output, child);
@@ -73,14 +73,14 @@ export default {
     }
   ),
 
-  install: async (dependencies, cwd, output) => {
+  install: async (dependencies, cwd, output, env) => {
     checkDependencies(dependencies);
     return new Promise(
       (resolve, reject) => {
         const child = spawn(
           'npm',
           ['install', ...dependencies],
-          { cwd }
+          { cwd, env }
         );
         outAsync(output, child);
         child.on('error', err => reject(err));
@@ -89,11 +89,11 @@ export default {
     );
   },
 
-  listSync: (cwd, output) => {
+  listSync: (cwd, output, env) => {
     const { stdout, stderr, error } = spawnSync(
       'npm',
       ['ls', '--depth=0', '--json'],
-      { cwd, encoding: 'utf8' }
+      { cwd, encoding: 'utf8', env }
     );
     outSync(output, stdout, stderr);
     try {
@@ -103,12 +103,12 @@ export default {
     }
   },
 
-  installSync: (dependencies, cwd, output) => {
+  installSync: (dependencies, cwd, output, env) => {
     checkDependencies(dependencies);
     const { stdout, stderr, error } = spawnSync(
       'npm',
       ['install', ...dependencies],
-      { cwd, encoding: 'utf8' }
+      { cwd, encoding: 'utf8', env }
     );
     outSync(output, stdout, stderr);
     if (error) throw error;

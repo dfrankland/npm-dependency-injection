@@ -53,10 +53,10 @@ const requireAll = (cwd, dependencies) =>
   );
 
 export default {
-  async: async (dependencies, { cwd = process.cwd(), output } = {}) => {
+  async: async (dependencies, { cwd = process.cwd(), output, env } = {}) => {
     let installedDependencies = [];
     try {
-      installedDependencies = await npm.list(cwd, output);
+      installedDependencies = await npm.list(cwd, output, env);
     } catch (err) {
       throw getFindError(cwd, err);
     }
@@ -65,7 +65,7 @@ export default {
 
     if (dependenciesToInstall.length > 0) {
       try {
-        await npm.install(dependenciesToInstall, cwd, output);
+        await npm.install(dependenciesToInstall, cwd, output, env);
       } catch (err) {
         throw getInstallError(cwd, err);
       }
@@ -74,10 +74,10 @@ export default {
     return requireAll(cwd, dependencies);
   },
 
-  sync: (dependencies, { cwd = process.cwd(), output } = {}) => {
+  sync: (dependencies, { cwd = process.cwd(), output, env } = {}) => {
     let installedDependencies = [];
     try {
-      installedDependencies = npm.listSync(cwd, output);
+      installedDependencies = npm.listSync(cwd, output, env);
     } catch (err) {
       throw getFindError(cwd, err);
     }
@@ -86,7 +86,7 @@ export default {
 
     if (dependenciesToInstall.length > 0) {
       try {
-        npm.installSync(dependenciesToInstall, cwd, output);
+        npm.installSync(dependenciesToInstall, cwd, output, env);
       } catch (err) {
         throw getInstallError(cwd, err);
       }
