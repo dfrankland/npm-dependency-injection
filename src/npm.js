@@ -80,6 +80,7 @@ export default {
         const child = spawn(
           'npm',
           ['install', ...dependencies],
+          { cwd }
         );
         outAsync(output, child);
         child.on('error', err => reject(err));
